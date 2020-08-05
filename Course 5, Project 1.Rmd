@@ -41,17 +41,18 @@ The mean number of steps is `r mean` and the median is `r median`
 What is the average daily activity pattern?
 
 ```{r warning = FALSE, message = FALSE}
-average_steps<-data %>% group_by(interval) %>% summarise(average_steps = mean(steps, na.rm = TRUE))
+data <-data %>% group_by(interval) %>% 
+  mutate(average_steps = mean(steps, na.rm = TRUE))
 
-ggplot(average_steps, aes(interval, average_steps)) + geom_line()
+ggplot(data, aes(interval, average_steps)) + geom_line()
 ```
 
 
 Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 ```{r}
-average_steps %>% summarise(max = max(average_steps))
+data %>% summarise(max = max(average_steps))
 
-max_interval<-average_steps[which.max(average_steps$average_steps),1]
+max_interval<-data[which.max(data$average_steps),1]
 
 ```
 The interval with the maximum number of steps is `r max_interval`
@@ -65,35 +66,38 @@ The number of rows with missing data is `r missing_rows`
 data
 
 ```{r}
-imput_function <- function(x, data) {
-  for (i in x) {
-if(is.na(data[i,1])) {
-data[i,1]<-average_steps$average_steps[average_steps$interval==data[i,3]]
-  } else {
-  data[i,1]<-data[i,1]
-  }
-    return(data)
-  }
+test <- function(x, y, z) {
+  if(is.na(x)==TRUE) y else z
 }
 
-data1<-imput_function(5, data)
+data$finalsteps <- mapply(test, data$steps, data$average_steps, data$steps)
 
-head(data1)
 ```
 
 
+```{r}
+sum2<-data %>% group_by(date) %>% summarise(dailysteps = sum(finalsteps))
+ggplot(sum2, aes(dailysteps)) + geom_histogram()
+```
+```{r message = FALSE, warning = FALSE}
+
+mean<-mean(sum2$dailysteps, na.rm = TRUE)
+median<-median(sum2$dailysteps,na.rm=TRUE)
+```
+                
+Using the dataset with imputed data, the mean number of steps is `r mean` and the median is `r median`
 
 
-data
+Are there differences in activity patterns between weekdays and weekends?
+```{r}
+data$dayoweek<-weekdays(as.Date(data$date))
+data<-data %>% mutate(dayoweek = ifelse(dayoweek == "Saturday" | dayoweek == "Sunday", "weekend", "weekday"))
 
+data <-data %>% group_by(dayoweek, interval) %>% 
+  mutate(average_steps2 = mean(finalsteps, na.rm = TRUE))
 
-data[7,]
-if(is.na(data[7,1])) {
-  data[7,1]<-average_steps$average_steps[average_steps$interval==data[7,3]]
-} else {
-  data[7,1] <- data[7,1]
-}
-data[7,]
- 
+data %>% group_by(dayoweek) %>% summarise(mean = mean(average_steps2))
 
+ggplot(data, aes(x=interval, y=average_steps2)) + geom_line(aes(color = dayoweek, linetype = dayoweek))
+```
 
