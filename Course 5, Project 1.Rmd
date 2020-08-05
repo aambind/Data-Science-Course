@@ -1,10 +1,9 @@
 ---
-  output:
-  word_document: default
-html_document: default
+output:
+  html_document: default
+  '': default
 ---
-  
-```{r}
+```{r include = FALSE}
 library(tidyverse)
 library(ggplot2)
 library(stringr)
@@ -15,26 +14,26 @@ download.file(url, destfile)
 unzip(destfile)
 data<-read.csv("activity.csv")
 
-data
-
 ```
 This code creates a histogram plot of the total number of steps taken each day:
   
-```{r}
-ggplot(data, aes(interval, steps)) + geom_col()
+```{r warning = FALSE}
+ggplot(data, aes(steps)) + geom_histogram(binwidth = 100)
 ```
 
 
 The code below provides the mean and median of steps each day
 
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 
-sum<-data %>% group_by(date) %>% summarise(sum = sum(steps)) %>% select(sum)
+sum<-as.numeric(unlist(c(data %>% group_by(date) %>% summarise(sum = sum(steps)) %>% select(sum))))
 mean<-mean(sum, na.rm = TRUE)
 median<-median(sum,na.rm=TRUE)
-````
-
+```
+                
 The mean number of steps is `r mean` and the median is `r median`
-
-```{r}
+                
+```{r warning = FALSE}
+ggplot(data, aes(interval, steps)) + geom_col()
+```
