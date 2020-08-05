@@ -41,7 +41,7 @@ The mean number of steps is `r mean` and the median is `r median`
 What is the average daily activity pattern?
 
 ```{r warning = FALSE, message = FALSE}
-average_steps<-data %>% group_by(interval) %>% summarise(average_steps = mean(steps, na.rm = TRUE))
+average_steps<-data %>% group_by(interval) %>% summarise(average_steps = mean(steps, na.rm = TRUE)) %>% ungroup()
 
 ggplot(average_steps, aes(interval, average_steps)) + geom_line()
 ```
@@ -55,3 +55,22 @@ max_interval<-average_steps[which.max(average_steps$average_steps),1]
 
 ```
 The interval with the maximum number of steps is `r max_interval`
+
+Imputing missing values: 
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+```{r}
+missing_rows<-nrow(data %>% filter(is.na(steps)))
+```
+The number of rows with missing data is `r missing_rows`
+data
+
+```{r}
+imput_function <- function(i, data) {
+if(is.na(data[i,1])) {
+data[i,1]<-average_steps[data[i,3], 2]
+  } else {
+  data[i,1]
+  }
+  data[i,]
+} 
+```
