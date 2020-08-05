@@ -15,10 +15,14 @@ unzip(destfile)
 data<-read.csv("activity.csv")
 
 ```
+What is the mean number of steps taken per day?
+
+
 This code creates a histogram plot of the total number of steps taken each day:
   
-```{r warning = FALSE}
-ggplot(data, aes(steps)) + geom_histogram(binwidth = 100)
+```{r message = FALSE, warning = FALSE}
+sum<-data %>% group_by(date) %>% summarise(dailysteps = sum(steps))
+ggplot(sum, aes(dailysteps)) + geom_histogram()
 ```
 
 
@@ -27,13 +31,27 @@ The code below provides the mean and median of steps each day
 
 ```{r message = FALSE, warning = FALSE}
 
-sum<-as.numeric(unlist(c(data %>% group_by(date) %>% summarise(sum = sum(steps)) %>% select(sum))))
-mean<-mean(sum, na.rm = TRUE)
-median<-median(sum,na.rm=TRUE)
+mean<-mean(sum$dailysteps, na.rm = TRUE)
+median<-median(sum$dailysteps,na.rm=TRUE)
 ```
                 
 The mean number of steps is `r mean` and the median is `r median`
-                
-```{r warning = FALSE}
-ggplot(data, aes(interval, steps)) + geom_col()
+
+
+What is the average daily activity pattern?
+
+```{r warning = FALSE, message = FALSE}
+average_steps<-data %>% group_by(interval) %>% summarise(average_steps = mean(steps, na.rm = TRUE))
+
+ggplot(average_steps, aes(interval, average_steps)) + geom_line()
 ```
+
+
+Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+```{r}
+average_steps %>% summarise(max = max(average_steps))
+
+max_interval<-average_steps[which.max(average_steps$average_steps),1]
+
+```
+The interval with the maximum number of steps is `r max_interval`
