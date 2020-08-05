@@ -65,12 +65,35 @@ The number of rows with missing data is `r missing_rows`
 data
 
 ```{r}
-imput_function <- function(i, data) {
+imput_function <- function(x, data) {
+  for (i in x) {
 if(is.na(data[i,1])) {
-data[i,1]<-average_steps[data[i,3], 2]
+data[i,1]<-average_steps$average_steps[average_steps$interval==data[i,3]]
   } else {
-  data[i,1]
+  data[i,1]<-data[i,1]
   }
-  data[i,]
-} 
+    return(data)
+  }
+}
+
+data1<-imput_function(5, data)
+
+head(data1)
 ```
+
+
+
+
+data
+
+
+data[7,]
+if(is.na(data[7,1])) {
+  data[7,1]<-average_steps$average_steps[average_steps$interval==data[7,3]]
+} else {
+  data[7,1] <- data[7,1]
+}
+data[7,]
+ 
+
+
