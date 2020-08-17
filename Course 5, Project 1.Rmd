@@ -1,9 +1,5 @@
----
-output:
-  html_document: default
-  '': default
----
-```{r include = FALSE}
+
+```{r}
 library(tidyverse)
 library(ggplot2)
 library(stringr)
@@ -46,24 +42,26 @@ data <-data %>% group_by(interval) %>%
 
 ggplot(data, aes(interval, average_steps)) + geom_line()
 ```
+Which 5-minute interval, average across all the days in the dataset, 
+contains the maximum number of steps?
 
+  ```{r}
 
-Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
-```{r}
-data %>% summarise(max = max(average_steps))
-
-max_interval<-data[which.max(data$average_steps),1]
+max_interval<-data[which.max(data$average_steps),]
 
 ```
 The interval with the maximum number of steps is `r max_interval`
 
 Imputing missing values: 
-1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+1. Calculate and report the total number of missing values in the dataset 
+(i.e. the total number of rows with NAs)
 ```{r}
 missing_rows<-nrow(data %>% filter(is.na(steps)))
 ```
 The number of rows with missing data is `r missing_rows`
-data
+
+In the following section, I replaced missing values with the average for 
+that specific interval across all other days. 
 
 ```{r}
 test <- function(x, y, z) {
@@ -74,7 +72,7 @@ data$finalsteps <- mapply(test, data$steps, data$average_steps, data$steps)
 
 ```
 
-
+This is the plot of daily steps using imputted values
 ```{r}
 sum2<-data %>% group_by(date) %>% summarise(dailysteps = sum(finalsteps))
 ggplot(sum2, aes(dailysteps)) + geom_histogram()
@@ -98,6 +96,6 @@ data <-data %>% group_by(dayoweek, interval) %>%
 
 data %>% group_by(dayoweek) %>% summarise(mean = mean(average_steps2))
 
-ggplot(data, aes(x=interval, y=average_steps2)) + geom_line(aes(color = dayoweek, linetype = dayoweek))
+ggplot(data, aes(x=interval, y=average_steps2)) + geom_line() + facet_wrap(~dayoweek)
 ```
 
