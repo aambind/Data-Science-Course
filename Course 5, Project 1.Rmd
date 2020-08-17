@@ -42,17 +42,20 @@ data <-data %>% group_by(interval) %>%
 
 ggplot(data, aes(interval, average_steps)) + geom_line()
 ```
+
+
 Which 5-minute interval, average across all the days in the dataset, 
 contains the maximum number of steps?
 
   ```{r}
 
-max_interval<-data[which.max(data$average_steps),]
+max_interval<-data[which.max(data$average_steps),3]
 
 ```
 The interval with the maximum number of steps is `r max_interval`
 
 Imputing missing values: 
+
 1. Calculate and report the total number of missing values in the dataset 
 (i.e. the total number of rows with NAs)
 ```{r}
@@ -73,7 +76,7 @@ data$finalsteps <- mapply(test, data$steps, data$average_steps, data$steps)
 ```
 
 This is the plot of daily steps using imputted values
-```{r}
+```{r warning = FALSE, message = FALSE}
 sum2<-data %>% group_by(date) %>% summarise(dailysteps = sum(finalsteps))
 ggplot(sum2, aes(dailysteps)) + geom_histogram()
 ```
@@ -87,7 +90,7 @@ Using the dataset with imputed data, the mean number of steps is `r mean` and th
 
 
 Are there differences in activity patterns between weekdays and weekends?
-```{r}
+```{r warning = FALSE, message = FALSE}
 data$dayoweek<-weekdays(as.Date(data$date))
 data<-data %>% mutate(dayoweek = ifelse(dayoweek == "Saturday" | dayoweek == "Sunday", "weekend", "weekday"))
 
